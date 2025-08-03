@@ -1,0 +1,132 @@
+$(document).ready(() => {
+  $("#regBtn").click(() => {
+    $("#regDiv").show();
+    $("#regBtn").hide();
+    $("#loginBtn").hide();
+  });
+
+  $("#registrationForm").submit((e) => {
+    e.preventDefault();
+
+    $(
+      "#nameError,#mobileNumberError,#emailerror,#userTypeError,#passworderror,#confirmPasswordError"
+    ).text("");
+
+    const name = $("input[name='name']").val().trim();
+    const contactNumber = $("input[name='contactNumber']").val().trim();
+    const email = $("input[name='email']").val().trim();
+    const userType = $("input[name='userType']").val().trim();
+    const password = $("input[name='password']").val().trim();
+    const confirmPassword = $("input[name='confirmPassword']").val().trim();
+
+    let isValid = true;
+
+    if (userType.toLowerCase() === "admin") {
+      $("#userTypeError").text("Admin already registered");
+      isValid = false;
+    }
+
+    if (confirmPassword !== password) {
+      $("#confirmPasswordError").text("Not match with password");
+      isValid = false;
+    }
+
+    const mobilePattern = /^\d{10}$/;
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!mobilePattern.test(contactNumber)) {
+      $("#mobileNumberError").text(
+        "Please enter a valid 10-digit mobile number."
+      );
+      isValid = false;
+    }
+
+    if (!emailPattern.test(email)) {
+      $("#emailerror").text("Please enter a valid email address.");
+      isValid = false;
+    }
+
+    if (!isValid) return;
+
+    const userData = { name, contactNumber, email, userType, password };
+    console.log(userData);
+
+    $.ajax({
+      url: "/api/user/userCreate",
+      type: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(userData),
+      success: function () {
+        window.location.href = "/admin/success";
+        $("#registrationForm")[0].reset();
+      },
+      error: function (xhr) {
+        if (xhr.status === 409) {
+          const errorMessage = xhr.responseJSON.error;
+          $("#loginError").text(errorMessage).show();
+        } else {
+          $("#loginError").text("Something went wrong").show();
+        }
+      },
+    });
+  });
+
+  // login
+
+  $("#loginBtn").click(() => {
+    $("#loginDiv").show();
+    $("#loginBtn").hide();
+    $("#regBtn").hide();
+  });
+
+  $("#loginForm").submit((e) => {
+    e.preventDefault();
+    console.log("Login form submitted!")
+
+    const email = $("input[name='loginEmail']").val().trim();
+    const password = $("input[name='loginPassword']").val().trim();
+
+    
+    let isValid = true;
+
+    if (!email) {
+      $("#emailerror").text("Email is required");
+      isValid = false;
+    }
+    if (!password) {
+      $("#passworderror").text("Password is required");
+      isValid = false;
+    }
+
+    if (!isValid) return;
+
+    const loginData = { email, password };
+    console.log(loginData)
+   $.ajax({
+  url: "/api/user/userCreate/login",
+  type: "POST",
+  contentType: "application/json",
+  data: JSON.stringify(loginData),
+  
+  success: function (res) {
+    console.log("Login success response:", res);
+    $("#loginError").hide();
+    setTimeout(function () {
+      window.location.href = "/user/userDashboard";
+    }, 1000);
+  },
+  error: function (xhr, status, error) {
+    console.error("Login AJAX error:", status, error);
+    let errorMsg = "Login failed. Please try again.";
+    try {
+      const response = JSON.parse(xhr.responseText);
+      errorMsg = response.message || errorMsg;
+    } catch (e) {
+      console.error("Error parsing response", e);
+    }
+    $("#loginError").text(errorMsg).show();
+  },
+});
+
+  });
+});
