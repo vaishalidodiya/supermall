@@ -1,4 +1,5 @@
 let isDataTableInitialized = false;
+const token = getLocalData("token");
 
 const showSuccessMessage = (message) => {
   $("#successMessage").text(message).fadeIn();
@@ -15,6 +16,14 @@ const loadCategoryTable = () => {
     ajax: {
       url: "/api/admin/category",
       type: "GET",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+      error: function (xhr, error, thrown) {
+        if (xhr.status === 401) {
+          window.location.href = "/admin/login";
+        }
+      },
     },
     columnDefs: [
       {
@@ -98,6 +107,9 @@ $(function () {
     $.ajax({
       url: "/api/admin/category",
       type: "POST",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
       contentType: "application/json",
       data: JSON.stringify(category),
       success: function () {
@@ -109,13 +121,15 @@ $(function () {
           window.location.href = "/admin/category";
         }, 3000);
       },
-
       error: function (xhr) {
-        console.error("XHR Error:", xhr);
-        alert(
-          "Something went wrong: " +
-            (xhr.responseJSON?.msg || xhr.statusText || "Unknown error")
-        );
+        if (xhr.status === 401) {
+          alert("Token expired");
+          setTimeout(function () {
+            window.location.href = "/admin/login";
+          }, 1000);
+        } else {
+          alert("Category list not loaded.");
+        }
       },
     });
   });
@@ -126,13 +140,23 @@ $(function () {
     $.ajax({
       url: actionUrl,
       method: "DELETE",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
       success: function () {
         showSuccessMessage("Category deleted successfully");
         $("#deleteConfirmModal").modal("hide");
         loadCategoryTable();
       },
       error: function () {
-        alert("Delete failed.");
+        if (xhr.status === 401) {
+          alert("Token expired");
+          setTimeout(function () {
+            window.location.href = "/admin/login";
+          }, 1000);
+        } else {
+          alert("Delete failed.");
+        }
       },
     });
   });
@@ -148,6 +172,9 @@ $(function () {
     $.ajax({
       url: actionUrl,
       type: "PATCH",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
       contentType: "application/json",
       data: JSON.stringify(updatedData),
       success: function () {
@@ -155,8 +182,18 @@ $(function () {
         $("#updateModal").modal("hide");
         loadCategoryTable();
       },
-      error: function () {
-        alert("Update failed.");
+      error: function (xhr) {
+        if (xhr.status === 401) {
+          alert("Token expired");
+          setTimeout(function () {
+            window.location.href = "/admin/login";
+          }, 1000);
+        } else {
+          alert(
+            "Update failed: " +
+              (xhr.responseJSON?.msg || xhr.statusText || "Unknown error")
+          );
+        }
       },
     });
   });

@@ -7,58 +7,101 @@
 
   
      {{> headers }}
+     <style>
+      .custom-store-btn {
+  background-color: rgb(31, 31, 148);
+  color: rgb(245, 231, 224);
+  border: none;
+}
+
+.custom-store-btn:hover {
+  background-color: rgb(175, 186, 236);
+  border: 1px solid black;
+  
+}
+
+#addStoreForm .form-control,
+#addStoreForm .form-select {
+    max-width: 400px;
+    margin: 10 auto 12px auto;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2); /* subtle shadow */
+    font-size: 20px;
+  }
+
+  #addProductForm .form-control,
+#addProductForm .form-select {
+  max-width: 400px;
+  margin: 10px auto 12px auto;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  font-size: 20px;
+}
+
+  .custom-hover-btn:hover {
+  background-color: rgb(44, 44, 190) !important;
+  color: white !important;
+  transform: scale(1.05);
+  transition: 0.3s;
+}
+
+.custom-hover-btn{
+  background-color: rgb(199, 211, 238);
+}
+
+ 
+  
+
+
+
+     </style>
   </head>
-  <body>
+  <body style="background-color: rgb(243, 239, 235);">
       
 
-  <div class="card">
-  <div class="card-header">
+ 
      {{> navigation }}
-  </div>
-  <div class="card-body">
+  
+  
     <div
       id="successMessage"
       class="alert alert-success text-center"
       style="display: none;"
     ></div>
-    <div id="inputDiv" class="px-4">
-      <button type="button" id="storeBtn" class="btn btn-primary mb-3">Add New
+    <div id="inputDiv" class="px-4 mt-5">
+      <button type="button" id="storeBtn" class="btn custom-store-btn mb-3 fs-5" >Add New
         Store</button>
 
           <h1 class="text-center">Store List</h1>
-      <table class="table" id="storeTable" >
+      <table class="table table-bordered border-secondary" id="storeTable" >
         <thead>
           <tr>
-            <th>Sr no.</th>
-            <th>Store Name</th>
-            <th>Address</th>
-            <th>Floor</th>
-            <th>Contact Number</th>
-            <th>Description</th>
-            <th>Actions</th>
+            <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Sr no.</th>
+            <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Store Name</th>
+            <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Address</th>
+            <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Floor</th>
+            <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Contact Number</th>
+            <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Description</th>
+            <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Actions</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
 
-      <button
-        type="button"
-        id="backToMenuFromList"
-        class="btn btn-secondary mt-3"
-      >Back</button>
+      
     </div>
 
-  </div>
-</div>
+  
+
   
     <div id="storeForm" style="display: none;" class="p-4 border rounded mx-4">
-      <h5>Add Store</h5>
+      <h5 class="text-center " style="color: rgb(13, 13, 107); margin-top:30px; font-size:40px">Add Store</h5>
       <form id="addstoreForm">
         <input
           type="text"
           class="form-control mb-2"
           placeholder="Store Name"
           name="storeName"
+          style="margin-top: 35px !important;"
+
           required
         />
         <div class="text-danger small" id="storeNameError"></div>
@@ -99,12 +142,16 @@
         />
         <div class="text-danger small" id="descriptionError"></div>
 
-        <input type="submit" value="Submit" id="storeSubmitBtn" class="btn btn-success" />
+        <div class="d-flex justify-content-center mt-3">
+
+        <input type="submit" value="Submit" id="storeSubmitBtn" class="btn text-white me-2 " style="background-color: rgb(31, 31, 148); font-size:20px;" />
         <button
           type="button"
           id="backToMenuFromAdd"
-          class="btn btn-secondary ms-2"
+         class="btn text-white " 
+         style="background-color: rgb(31, 31, 148); font-size:20px;"
         >Back</button>
+        </div>
       </form>
     </div>
 
@@ -220,112 +267,133 @@
     </div>
 
 <!-- view -->
-<div id="viewStorePage" class="p-4" style="display: none;">
-  <h3 class="text-center mb-4">Store Details</h3>
-  <div class="card">
-    <div class="card-body">
-      <p><strong>Store Name:</strong> <span id="viewStoreName"></span></p>
-      <p><strong>Address:</strong> <span id="viewAddress"></span></p>
-      <p><strong>Floor:</strong> <span id="viewFloor"></span></p>
-      <p><strong>Contact Number:</strong> <span id="viewContactNumber"></span></p>
-      <p><strong>Description:</strong> <span id="viewDescription"></span></p>
+<div id="viewStorePage" class="p-4" style="display: none; ">
+  <h3 class="text-center mb-4 mt-2 fs-1" style="color: rgb(13, 13, 107); margin-top:50px">Store Details</h3>
+
+  <!-- Centered Store Details -->
+  <div class="d-flex justify-content-center">
+    <div class="card" style="max-width: 300px; width: 100%;">
+      <div class="card-body" style="background-color: rgb(243, 239, 235); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+        <p><strong>Store Name:</strong> <span id="viewStoreName"></span></p>
+        <p><strong>Address:</strong> <span id="viewAddress"></span></p>
+        <p><strong>Floor:</strong> <span id="viewFloor"></span></p>
+        <p><strong>Contact Number:</strong> <span id="viewContactNumber"></span></p>
+        <p><strong>Description:</strong> <span id="viewDescription"></span></p>
+      </div>
     </div>
   </div>
-  <div>
-    <button id="addProduct" class="mt-3">Add Product</button>
-    <button id="listProduct" class="ms-2" >List of Products</button>
+
+  <!-- Centered Add & List Product Buttons -->
+  <div class="mt-4 d-flex justify-content-center">
+    <button id="addProduct" class="btn custom-store-btn me-2" style="font-size:20px; font-weight:bolder">Add Product</button>
+    <button id="listProduct" class="btn custom-store-btn" style="font-size:20px; font-weight:bolder">List of Products</button>
   </div>
-  <div class="mt-4 text-center">
-    <button id="backToListFromView" class="btn btn-secondary">Back</button>
+
+  <!-- Left-aligned Back Button -->
+  <div class="mt-3 d-flex justify-content">
+    <button id="backToListFromView" class="btn custom-store-btn" style="font-size:20px; font-weight:bolder; margin-left:780px; color:rgb(241, 129, 77);">Back</button>
   </div>
 </div>
 
 
+
 <!-- Product -->
+
    <div
       id="productSuccessMessage"
       class="alert alert-success text-center"
       style="display: none;"
     ></div>
 <div id="productForm" class="p-4 border rounded mx-4" style="display: none;">
-      <h5>Add Product</h5>
+      <h5 class="text-center " style="color: rgb(13, 13, 107); margin-top:30px; font-size:40px">Add Product</h5>
       <form id="addProductForm">
         <input
           type="text"
-          class="form-control mb-2"
+          class="form-control"
           placeholder="Product Name"
           name="productName"
+          style="margin-top: 35px !important;"
           required
         />
         <div class="text-danger small" id="productNameError"></div>
 
         <input
           type="text"
-          class="form-control mb-2"
+          class="form-control"
           placeholder="Description"
           name="productDescription"
           required
         />
         <div class="text-danger small" id="descriptionError"></div>
 
-        <input
-          type="text"
-          class="form-control mb-2"
-          placeholder="Floor"
-          name="productFloor"
-          required
-        />
-        <div class="text-danger small" id="productFloorError"></div>
+        
+
+          <select class="form-select" aria-label="Default select example" id="floorDropdown">
+                    <option value="0" selected>Choose Floor</option>
+
+        </select>
 
         <input
           type="text"
-          class="form-control mb-2"
+          class="form-control"
           placeholder="Features"
           name="features"
           required
         />
         <div class="text-danger small" id="featuresError"></div>
 
+        <select class="form-select" aria-label="Default select example" id="categoryDropdown">
+                    <option selected>Choose Category</option>
+
+        </select>
+         
+
         <input
           type="text"
-          class="form-control mb-2"
+          class="form-control"
           placeholder="Price"
           name="price"
           required
         />
         <div class="text-danger small" id="priceError"></div>
 
-        <input type="submit" value="Submit" id="productSubmitBtn" class="btn btn-success" />
-        <button
-          type="button"
-          id="backToMenuFromAddProduct"
-          class="btn btn-secondary ms-2"
-        >Back</button>
+          <select class="form-select" aria-label="Default select example" id="offerDropdown">
+          <option selected>Choose Offer</option>
+        </select>
+
+        <!-- Centered buttons with proper background color -->
+<div class="d-flex justify-content-center mt-3">
+  <input type="submit" value="Submit" id="productSubmitBtn" class="btn text-white me-2 " style="background-color: rgb(31, 31, 148); font-size:20px;" />
+  <button type="button" id="backToMenuFromAddProduct" class="btn text-white " style="background-color: rgb(31, 31, 148); font-size:20px;">Back</button>
+</div>
+
       </form>
     </div>
 
     <!-- list of products -->
 
       <div class="px-4" style="display: none;" id="productList">
-        <h1>Product List</h1>
+        <h1 class="text-center" style="color: rgb(13, 13, 107); margin-top:50px">Product List</h1>
 
-        <table class="table" id="productTable">
+        <table class="table table-bordered border-secondary" id="productTable">
           <thead>
             <tr>
-              <th>Sr no.</th>
-              <th>Product Name</th>
-              <th>Description</th>
-              <th>Floor</th>
-              <th>Features</th>
-              <th>Price</th>
-              <th>Actions</th>
+              <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Sr no.</th>
+              <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Product Name</th>
+              <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Description</th>
+              <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Floor</th>
+              <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Features</th>
+              <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Category</th>
+              <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Price</th>
+              <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Offer</th>
+              <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Actions</th>
             </tr>
           </thead>
           <tbody></tbody>
 
         </table>
 
-        <button type="button" id="backToMenuFromProductList" class="btn btn-secondary mt-3">Back</button>
+        <button type="button" id="backToMenuFromProductList" class="btn btn-secondary mt-3" style="background-color: rgb(31, 31, 148); color:rgb(245, 231, 224)">Back</button>
       </div>
 
        <!-- Product Delete Modal -->
@@ -393,16 +461,13 @@
                 required
               />
 
-               <label for="updateProductFloor">Floor:</label>
-              <input
-                type="text"
-                id="updateProductFloor"
-                name="floor"
-                class="form-control mb-2"
-                required
-              />
-              <div class="text-danger small" id="productFloorUpdateError"></div>
+               
+              <label for="updateFloorDropdown">Floor:</label>
 
+              <select class="form-select" aria-label="Default select example" id="updateFloorDropdown">
+                    <option value="0" selected>Choose Floor</option>
+
+              </select>
 
               <label for="features">Features:</label>
               <input
@@ -413,6 +478,15 @@
                 required
               />
 
+              <label for="updateCategoryDropdown">Category:</label>
+
+              <select class="form-select" aria-label="Default select example" id="updateCategoryDropdown">
+                    <option selected>Choose Category</option>
+
+              </select>
+         
+
+
               <label for="productPrice">Price:</label>
               <input
                 type="text"
@@ -421,6 +495,12 @@
                 class="form-control mb-2"
                 required
               />
+            
+            <label for="updateOfferDropdown">Offer:</label>
+
+            <select class="form-select" aria-label="Default select example" id="updateOfferDropdown">
+                  <option selected>Choose Offer</option>
+            </select>
              
             </div>
             <div class="modal-footer">

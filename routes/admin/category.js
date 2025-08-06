@@ -6,9 +6,6 @@ route.get('/',(req,res)=>{
   res.render('category')
 })
 
-route.get('/:id/edit',(req,res)=>{
-
-})
-
 module.exports = route;
+
 

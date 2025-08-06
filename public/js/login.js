@@ -24,10 +24,12 @@ $("#loginForm").submit((e) => {
     type: "POST",
     contentType: "application/json",
     data: JSON.stringify(loginData),
-    success: function () {
+    success: function (data, textStatus, jqXHR) {
+      console.log('data: ',data)
+      setLocalData('token',data?.data?.token);
       $("#loginError").hide();
       setTimeout(function () {
-        window.location.href = "/admin/dashboard";
+        window.location.href = "/admin/store";
       }, 1000);
     },
     error: function (xhr) {

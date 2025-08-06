@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Compare Products</title>
+        {{> headers }}
+    <style>
+   #comparisonBody tr td:first-child {
+    font-weight: bolder;
+  }
+</style>
+  
+        
+</head>
+<body style="background-color: rgb(243, 239, 235);">
+
+  {{> dashboard }}
+
+  <div class="container mt-5">
+    <h2 class="text-center mb-4" style="color: rgb(13, 13, 107);">Compare Products</h2>
+
+    <div class="row mb-4" id="mainDiv">
+      <div class="col-md-5">
+        <label for="product1" class="form-label">Select Product 1</label>
+        <select id="product1" class="form-select" style="border: 1px solid black;"></select>
+      </div>
+      <div class="col-md-5">
+        <label for="product2" class="form-label"  >Select Product 2</label>
+        <select id="product2" class="form-select" style="border: 1px solid black;"></select>
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button class="btn btn-primary w-100" id="compareBtn">Compare</button>
+      </div>
+    </div>
+      <p id="noProductsMsg" style="display:none; color: red; font-weight: bold;">
+  No products available.
+</p>
+    <div class="table-responsive">
+
+    <table class="table table-bordered text-center  border-secondary" id="comparisonTable" style="display: none;">
+      <thead >
+        <tr >
+          <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:25px;">Attribute</th>
+          <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:25px;">Product 1</th>
+          <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:25px;">Product 2</th>
+        </tr>
+      </thead>
+      <tbody id="comparisonBody"></tbody>
+    </table>
+      </div>
+
+  </div>
+
+  <script src="../js/compareProduct.js"></script>
+
+</body>
+</html>

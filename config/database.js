@@ -14,26 +14,26 @@ const {
 } = process.env;
 
 const url = `mongodb://${DB_HOST}:${DB_PORT}/${DB_NAME}`;
-console.log('url : ', url);
 
 mongoose
   .connect(url, {})
   .then(async (d) => {
-    const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 10);
-    const admin = await userModel.findOne({ userType: "Admin" });
-
+    const admin = await userModel.findOne({ userType: "admin" });
+    
     if (!admin) {
-      userModel.create({
+      const hashedPassword = bcrypt.hashSync(ADMIN_PASSWORD, bcrypt.genSaltSync(10));
+      
+      await userModel.create({
         name: ADMIN_NAME,
         contactNumber: ADMIN_CONTACTNUMBER,
         email: ADMIN_EMAIL,
         password: hashedPassword,
-        userType: "Admin",
+        userType: "admin",
       });
     }
 
-    console.log("connected");
+    console.log("database connected successfully");
   })
   .catch((e) => {
-    console.log("not connected", e);
+    console.log("database not connected", e);
   });

@@ -1,4 +1,7 @@
+
+
 let isDataTableInitialized = false;
+const token = getLocalData("token");
 
 const showSuccessMessage = (message) => {
   $("#successMessage").text(message).fadeIn();
@@ -21,9 +24,18 @@ const loadstoreTable = () => {
     processing: true,
     serverSide: true,
     destroy: true,
+    search: true,
     ajax: {
       url: "/api/admin/store",
       type: "GET",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+      error: function (xhr) {
+        if (xhr.status === 401) {
+          window.location.href = "/admin/login";
+        }
+      },
     },
     columnDefs: [
       {
@@ -32,11 +44,11 @@ const loadstoreTable = () => {
       },
       {
         targets: [1],
-        data: "storeName",
+        data: "storeName"
       },
       {
         targets: [2],
-        data: "address",
+        data: "address"
       },
       {
         targets: [3],
@@ -44,11 +56,11 @@ const loadstoreTable = () => {
       },
       {
         targets: [4],
-        data: "contactNumber",
+        data: "contactNumber"
       },
       {
         targets: [5],
-        data: "description",
+        data: "description"
       },
       {
         targets: [6],
@@ -56,7 +68,7 @@ const loadstoreTable = () => {
         sorting: false,
         orderable: false,
         render: function (data, type, row, meta) {
-          let html = `<button class="btn btn-sm bg-secondary-subtle ms-2 fs-6 fw-bold view-btn"
+          let html = `<button class="btn btn-sm  ms-2 fs-6 fw-bold view-btn custom-hover-btn"
             data-id="${row._id}"
             data-storename="${row.storeName}"
             data-address="${row.address}"
@@ -64,7 +76,7 @@ const loadstoreTable = () => {
             data-contactnumber="${row.contactNumber}"
             data-description="${row.description}"
             >View</button>`;
-            html += `<button class="btn btn-sm btn-warning ms-2 fa fa-edit"
+          html += `<button class="btn btn-sm btn-warning ms-2 fa fa-edit"
             onclick="openUpdateModal(this)"
             data-id="${row._id}"
             data-storename="${row.storeName}"
@@ -73,7 +85,7 @@ const loadstoreTable = () => {
             data-contactnumber="${row.contactNumber}"
             data-description="${row.description}"
             ></button>`;
-            html += `<button  onclick="openDeleteModal(this)" data-id="${row._id}" class="delete-btn btn btn-danger  btn-sm fa fa-trash ms-2" title="Delete"></button>`;
+          html += `<button  onclick="openDeleteModal(this)" data-id="${row._id}" class="delete-btn btn btn-danger  btn-sm fa fa-trash ms-2" title="Delete"></button>`;
           return html;
         },
       },
@@ -163,6 +175,9 @@ $(function () {
     $.ajax({
       url: "/api/admin/store",
       type: "POST",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
       contentType: "application/json",
       data: JSON.stringify(storeData),
       success: function () {
@@ -171,11 +186,18 @@ $(function () {
         $("#addstoreForm")[0].reset();
 
         setTimeout(function () {
-          window.location.href = "/admin/dashboard";
+          window.location.href = "/admin/store";
         }, 3000);
       },
       error: function (xhr) {
-        alert("Error: " + xhr.responseText);
+        if (xhr.status === 401) {
+          $("#loginError").text("Token expired").show();
+          setTimeout(function () {
+            window.location.href = "/admin/login";
+          }, 1000);
+        } else {
+          alert("Error: ", xhr);
+        }
       },
     });
   });
@@ -186,13 +208,23 @@ $(function () {
     $.ajax({
       url: actionUrl,
       type: "DELETE",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
       success: function () {
         showSuccessMessage("Store deleted successfully");
         $("#deleteConfirmModal").modal("hide");
         loadstoreTable();
       },
-      error: function () {
-        alert("Delete failed.");
+      error: function (xhr) {
+        if (xhr.status === 401) {
+          alert("Token expired");
+          setTimeout(function () {
+            window.location.href = "/admin/login";
+          }, 1000);
+        } else {
+          alert("Delete failed.");
+        }
       },
     });
   });
@@ -244,6 +276,7 @@ $(document).on("click", ".view-btn", function () {
   currentStoreId = $(this).data("id");
   const storeFloor = parseInt($(this).data("floor"), 10);
   currentStoreMaxFloor = storeFloor;
+  floorDropdown();
 
   $("#viewStoreName").text($(this).data("storename"));
   $("#viewAddress").text($(this).data("address"));
@@ -288,16 +321,20 @@ $("#addProductForm").submit((e) => {
 
   const productName = $("input[name='productName']").val().trim();
   const description = $("input[name='productDescription']").val().trim();
-  const floor = $("input[name='productFloor']").val().trim();
+  const floor = $("#floorDropdown").val().trim();
+  const category = $("#categoryDropdown").val().trim();
   const features = $("input[name='features']").val().trim();
   const price = $("input[name='price']").val().trim();
+  const offer = $("#offerDropdown").val().trim();
 
   console.log("Form values:", {
     productName,
     description,
     floor,
     features,
+    category,
     price,
+    offer,
   });
 
   let isValid = true;
@@ -307,21 +344,8 @@ $("#addProductForm").submit((e) => {
     isValid = false;
   }
   if (!description) {
-    $("#descriptionError").text("Description is required");
+    $("#productDescriptionError").text("Description is required");
     isValid = false;
-  }
-  const floorVal = parseInt(floor, 10);
-  if (
-    !floor ||
-    isNaN(floorVal) ||
-    floorVal < 1 ||
-    floorVal > currentStoreMaxFloor
-  ) {
-    $("#productFloorError").text(
-      `Floor must be between 1 and ${currentStoreMaxFloor}`
-    );
-    isValid = false;
-    return;
   }
 
   if (!features) {
@@ -346,9 +370,11 @@ $("#addProductForm").submit((e) => {
   const productData = {
     productName,
     description,
-    floor: floorVal,
+    floor,
     features,
+    categoryId: category, // this must be a string ObjectId
     price,
+    offerId: offer, // this too
     storeId: currentStoreId,
   };
 
@@ -359,17 +385,27 @@ $("#addProductForm").submit((e) => {
     type: "POST",
     contentType: "application/json",
     data: JSON.stringify(productData),
+    headers: {
+      Authorization: "Bearer " + token,
+    },
     success: function () {
       productSuccessMessage("Product added successfully");
       $("#addProductForm")[0].reset();
       setTimeout(function () {
-        window.location.href = "/admin/dashboard";
+        window.location.href = "/admin/store";
       }, 3000);
     },
     error: function (xhr, status, error) {
-      console.error("AJAX error:", error);
-      console.error("Response:", xhr.responseText);
-      alert("Error: " + xhr.responseText);
+      if (xhr.status === 401) {
+        alert("Token expired");
+        setTimeout(function () {
+          window.location.href = "/admin/login";
+        }, 1000);
+      } else {
+        console.error("AJAX error:", error);
+        console.error("Response:", xhr.responseText);
+        alert("Error: " + xhr.responseText);
+      }
     },
   });
 });
@@ -384,52 +420,58 @@ const loadProductTable = () => {
     ajax: {
       url: `/api/admin/product?storeId=${currentStoreId}`,
       type: "GET",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+      error: function (xhr) {
+        if (xhr.status === 401) {
+          window.location.href = "/admin/login";
+        }
+      },
     },
     columnDefs: [
+      { targets: [0], data: "seqNo" },
+      { targets: [1], data: "productName" },
+      { targets: [2], data: "description" },
+      { targets: [3], data: "floor" },
+      { targets: [4], data: "features" },
+      { targets: [5], data: "categoryName" }, // <- show category name
+      { targets: [6], data: "price" },
+      { targets: [7], data: "offerName" }, // <- show offer name
       {
-        targets: [0],
-        data: "seqNo",
-      },
-      {
-        targets: [1],
-        data: "productName",
-      },
-      {
-        targets: [2],
-        data: "description",
-      },
-      {
-        targets: [3],
-        data: "floor",
-      },
-      {
-        targets: [4],
-        data: "features",
-      },
-      {
-        targets: [5],
-        data: "price",
-      },
-      {
-        targets: [6],
+        targets: [8],
         data: null,
         sorting: false,
         orderable: false,
         render: function (data, type, row, meta) {
-          let html = `
-          <button class="btn btn-sm btn-warning fa fa-edit"
-          onclick="productUpdateModal(this)"
-                data-id="${row._id}"
-                data-product-name="${row.productName}"
-                data-description="${row.description}"
-                data-floor="${row.floor}"
-                data-features="${row.features}"
-                data-price="${row.price}"
-                ></button>`;
-          html += `<button  onclick="productDeleteModal(this)" data-id="${row._id}" class="delete-btn btn btn-danger  btn-sm fa fa-trash ms-2" title="Delete"></button>`;
+          const categoryId =
+            typeof row.categoryId === "object" && row.categoryId?._id
+              ? row.categoryId._id
+              : "";
 
-          console.log("floor log: ", row.floor);
-          return html;
+          const offerId =
+            typeof row.offerId === "object" && row.offerId?._id
+              ? row.offerId._id
+              : "";
+
+          return `
+    <button class="btn btn-sm btn-warning fa fa-edit"
+      onclick="productUpdateModal(this)"
+      data-id="${row._id}"
+      data-product-name="${row.productName}"
+      data-description="${row.description}"
+      data-floor="${row.floor}"
+      data-features="${row.features}"
+      data-category-id="${categoryId}"
+      data-price="${row.price}"
+      data-offer-id="${offerId}">
+    </button>
+
+    <button onclick="productDeleteModal(this)"
+      data-id="${row._id}"
+      class="delete-btn btn btn-danger btn-sm fa fa-trash ms-2"
+      title="Delete">
+    </button>`;
         },
       },
     ],
@@ -439,6 +481,10 @@ const loadProductTable = () => {
 $("#listProduct").click(() => {
   $("#productList").show();
   $("#viewStorePage").hide();
+
+  if ($.fn.DataTable.isDataTable("#productTable")) {
+    $("#productTable").DataTable().clear().destroy();
+  }
   loadProductTable();
 });
 
@@ -459,40 +505,51 @@ $("#deleteProductForm").submit(function (e) {
   $.ajax({
     url: actionUrl,
     type: "DELETE",
+    headers: {
+      Authorization: "Bearer " + token,
+    },
     success: function () {
       productSuccessMessage("Product deleted successfully");
       $("#deleteProductModal").modal("hide");
       loadProductTable();
+    },
+    error: function (xhr) {
+      if (xhr.status === 401) {
+        alert("Token expired");
+        setTimeout(function () {
+          window.location.href = "/admin/login";
+        }, 1000);
+      } else {
+        alert(
+          "Delete failed: " +
+            (xhr.responseJSON?.msg || xhr.statusText || "Unknown error")
+        );
+      }
     },
   });
 });
 
 // Product Update
 
-function productUpdateModal(button) {
+async function productUpdateModal(button) {
+  const selectedCategoryId = button.dataset.categoryId;
+  const selectedOfferId = button.dataset.offerId;
+  const selectedFloor = button.dataset.floor;
+
+  await populateUpdateDropdowns(
+    selectedCategoryId,
+    selectedOfferId,
+    selectedFloor
+  );
+
   $("#updateProductForm").attr(
     "action",
     `/api/admin/product/${button.dataset.id}`
   );
-  $("#productUpdateModal").on("shown.bs.modal", function () {
-    $("#updateProductFloor").val(button.dataset.floor);
-  });
   $("#updateProductName").val(button.dataset.productName);
   $("#productDescription").val(button.dataset.description);
-  $("#updateProductFloor").val(button.dataset.floor);
   $("#features").val(button.dataset.features);
   $("#productPrice").val(button.dataset.price);
-
-  console.log("Floor value received:", button.dataset.floor);
-
-  const floor = parseInt($("#updateProductFloor").val().trim());
-
-  if (!floor || isNaN(floor) || floor < 1 || floor > currentStoreMaxFloor) {
-    $("#productFloorUpdateError").text(
-      `Floor must be between 1 and ${currentStoreMaxFloor}`
-    );
-    return;
-  }
 
   new bootstrap.Modal(document.getElementById("productUpdateModal")).show();
 }
@@ -500,37 +557,23 @@ function productUpdateModal(button) {
 $("#updateProductForm").submit(function (e) {
   e.preventDefault();
 
-  const floorVal = parseInt($("#updateProductFloor").val().trim(), 10);
-  $("#productFloorUpdateError").text("");
-
-  let isValid = true;
-
-  if (
-    !floorVal ||
-    isNaN(floorVal) ||
-    floorVal < 1 ||
-    floorVal > currentStoreMaxFloor
-  ) {
-    $("#productFloorUpdateError").text(
-      `Floor must be between 1 and ${currentStoreMaxFloor}`
-    );
-    isValid = false;
-  }
-
-  if (!isValid) return;
-
   const actionUrl = $(this).attr("action");
   const productdData = {
     productName: $("#updateProductName").val(),
     description: $("#productDescription").val(),
-    floor: floorVal,
+    floor: $("#updateFloorDropdown").val(),
     features: $("#features").val(),
+    categoryId: $("#updateCategoryDropdown").val(),
     price: $("#productPrice").val(),
+    offerId: $("#updateOfferDropdown").val(),
   };
   console.log("productData :", productdData);
   $.ajax({
     url: actionUrl,
     type: "PATCH",
+    headers: {
+      Authorization: "Bearer " + token,
+    },
     contentType: "application/json",
     data: JSON.stringify(productdData),
     success: function () {
@@ -538,8 +581,205 @@ $("#updateProductForm").submit(function (e) {
       $("#productUpdateModal").modal("hide");
       loadProductTable();
     },
-    error: function () {
-      alert("Update failed.");
+    error: function (xhr) {
+      if (xhr.status === 401) {
+        alert("Token expired");
+        setTimeout(function () {
+          window.location.href = "/admin/login";
+        }, 1000);
+      } else {
+        alert(
+          "Update failed: " +
+            (xhr.responseJSON?.msg || xhr.statusText || "Unknown error")
+        );
+      }
     },
   });
 });
+
+$(document).ready(function () {
+  categoryDropdown();
+  offerDropdown();
+});
+
+const categoryDropdown = () => {
+  $.ajax({
+    url: "/api/admin/category",
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+    success: function (data) {
+      let html = '<option value="" disabled selected>Select Category</option>';
+      if (Array.isArray(data?.data)) {
+        for (let i = 0; i < data.data.length; i++) {
+          html += ` <option value=${data.data[i]._id}>${data.data[i].categoryName}</option>`;
+        }
+      } else {
+        console.warn("Unexpected response structure", data);
+      }
+      $("#categoryDropdown").html(html);
+    },
+    error: function (xhr, data) {
+      if (xhr.status === 401) {
+        window.location.href = "/admin/login";
+      }
+    },
+  });
+};
+
+const offerDropdown = () => {
+  $.ajax({
+    url: "/api/admin/offer",
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+    success: function (data) {
+      let html = '<option value="" disabled selected>Select Offer</option>';
+      if (Array.isArray(data?.data)) {
+        for (let i = 0; i < data.data.length; i++) {
+          html += ` <option value=${data.data[i]._id}>${data.data[i].offerName}</option>`;
+        }
+      } else {
+        console.warn("Unexpected response structure ", data);
+      }
+      $("#offerDropdown").html(html);
+    },
+    error: function (xhr, data) {
+      if (xhr.status === 401) {
+        window.location.href = "/admin/login";
+      }
+    },
+  });
+};
+
+const floorDropdown = () => {
+  $.ajax({
+    url: "/api/admin/store/" + currentStoreId,
+    type: "GET",
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+    success: function (data, status) {
+      const floor = parseInt(data.floor);
+      let html = '<option value="">Select Floor</option>';
+      for (let i = 1; i <= floor; i++) {
+        html += `<option value="${i}">${i}</option>`;
+      }
+      $("#floorDropdown").html(html); // Clear and add new options
+    },
+    error: function (xhr) {
+      if (xhr.status === 401) {
+        alert("Token expired");
+        setTimeout(function () {
+          window.location.href = "/admin/login";
+        }, 1000);
+      } else {
+        alert(
+          "Something went wrong: " +
+            (xhr.responseJSON?.msg || xhr.statusText || "Unknown error")
+        );
+      }
+    },
+  });
+};
+
+async function populateUpdateDropdowns(
+  selectedCategoryId,
+  selectedOfferId,
+  selectedFloor
+) {
+  // Floor dropdown
+  $.ajax({
+    url: `/api/admin/store/${currentStoreId}`,
+    type: "GET",
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+    success: function (data) {
+      let html = '<option value="" disabled>Choose Floor</option>';
+      for (let i = 1; i <= data.floor; i++) {
+        html += `<option value="${i}" ${
+          i == selectedFloor ? "selected" : ""
+        }>${i}</option>`;
+      }
+      $("#updateFloorDropdown").html(html);
+    },
+    error: function (xhr) {
+      if (xhr.status === 401) {
+        alert("Token expired");
+        setTimeout(function () {
+          window.location.href = "/admin/login";
+        }, 1000);
+      } else {
+        alert(
+          "Something went wrong: " +
+            (xhr.responseJSON?.msg || xhr.statusText || "Unknown error")
+        );
+      }
+    },
+  });
+
+  // Category dropdown
+  $.ajax({
+    url: "/api/admin/category",
+    type: "GET",
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+    success: function (data) {
+      let html = '<option value="" disabled>Choose Category</option>';
+      data.data.forEach((cat) => {
+        html += `<option value="${cat._id}" ${
+          cat._id == selectedCategoryId ? "selected" : ""
+        }>${cat.categoryName}</option>`;
+      });
+      $("#updateCategoryDropdown").html(html);
+    },
+    error: function (xhr) {
+      if (xhr.status === 401) {
+        alert("Token expired");
+        setTimeout(function () {
+          window.location.href = "/admin/login";
+        }, 1000);
+      } else {
+        alert(
+          "Something went wrong: " +
+            (xhr.responseJSON?.msg || xhr.statusText || "Unknown error")
+        );
+      }
+    },
+  });
+
+  // Offer dropdown
+  $.ajax({
+    url: "/api/admin/offer",
+    type: "GET",
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+    success: function (data) {
+      let html = '<option value="" disabled>Choose Offer</option>';
+      data.data.forEach((offer) => {
+        html += `<option value="${offer._id}" ${
+          offer._id == selectedOfferId ? "selected" : ""
+        }>${offer.offerName}</option>`;
+      });
+      $("#updateOfferDropdown").html(html);
+    },
+    error: function (xhr) {
+      if (xhr.status === 401) {
+        alert("Token expired");
+        setTimeout(function () {
+          window.location.href = "/admin/login";
+        }, 1000);
+      } else {
+        alert(
+          "Something went wrong: " +
+            (xhr.responseJSON?.msg || xhr.statusText || "Unknown error")
+        );
+      }
+    },
+  });
+}

@@ -1,35 +1,36 @@
-<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-   {{> headers }}
-</head>
-<body>
-  
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Login</title>
+      {{> headers }}
 
-   <div class="d-flex justify-content-center mt-5">
-    <div class="p-4 border rounded bg-light" style="min-width: 300px; " id="loginDiv">
-      <h1 class="text-center" >Login</h1>
-      <form id="loginForm" >
+    
+  </head>
+  <body>
+
+    <div class="d-flex justify-content-center mt-5">
+    <div class="p-4 border rounded bg-light" style="min-width: 300px;">
+      <h1 class="text-center">Login</h1>
+      <form id="userLoginForm" >
         <label for="email" class="form-label mt-2">Email:</label>
-        <input class="form-control mb-3" type="email" placeholder="Email" required name="loginEmail">
+        <input class="form-control mb-3" type="email" placeholder="Email" required name="email">
                   <div class="text-danger small" id="emailerror"></div>
 
         <label for="password" class="form-label">Password:</label>
-        <input class="form-control mb-3" type="password" placeholder="Password" required name="loginPassword">
+        <input class="form-control mb-3" type="password" placeholder="Password" required name="password">
                 <div class="text-danger small" id="passworderror"></div>
 
-        <div id="loginErrorMsg" class="text-danger text-center mb-2" style="display: none;">Incorrect Details</div>
+        <div id="loginError" class="text-danger text-center mb-2" style="display: none;">Incorrect Details</div>
 
         <button type="submit" class="btn btn-primary w-100">Submit</button>
       </form>
     </div>
   </div>
 
+    <script src="../js/user.js"></script>
 
-      <script src="../js/user.js"></script>
 
-</body>
+  </body>
+
 </html>

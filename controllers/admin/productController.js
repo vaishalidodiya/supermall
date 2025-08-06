@@ -8,18 +8,28 @@ const productList = async (req, res) => {
   try {
     const filter = storeId ? { storeId } : {};
 
-    let products = await Product.find(
-      filter,
-      {},
-      { skip: start, limit: length, sort: { createdAt: -1 }, lean: true }
-    );
-
     const total = await Product.countDocuments(filter);
 
-    products = products.map((elem, index) => {
-      elem.seqNo = index + start + 1;
-      return elem;
-    });
+    let products = await Product.find(filter)
+      .skip(start)
+      .limit(length)
+      .sort({ createdAt: -1 })
+      .populate("categoryId", "categoryName") // <-- Get categoryName
+      .populate("offerId", "offerName")       // <-- Get offerName
+        .select("_id productName description floor features price storeId categoryId offerId createdAt updatedAt") // explicitly include _id
+
+      .lean();
+
+    products = products.map((elem, index) => ({
+      ...elem,
+      seqNo: index + start + 1,
+      categoryName: elem.categoryId?.categoryName || "N/A",
+      offerName: elem.offerId?.offerName || "N/A",
+    }));
+
+    console.log('product data: ', products);
+    console.log('🔥 Requested storeId:', storeId);
+console.log('🔥 Returned products:', products);
 
     res.json({
       status: 0,
@@ -34,24 +44,30 @@ const productList = async (req, res) => {
 };
 
 
+
 const productDetails = async (req, res) => {
   try {
-    const products = await Product.findOne({
-      _id: req.params.id,
-    });
-    if (!products)
+    const product = await Product.findOne({ _id: req.params.id })
+      .populate("categoryId", "categoryName")
+      .populate("offerId", "offerName");
+
+    if (!product) {
       return res.status(404).json({ message: "Product not found" });
-    res.json({ products });
+    }
+
+    res.json({ product });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
+
 const productCreate = async (req, res) => {
   try {
     console.log("🔥 Received product data:", req.body); // Should show your data
 
-    const { productName, description, floor, features, price, storeId } = req.body;
+    const { productName, description, floor, features,categoryId, price,offerId, storeId } = req.body;
+    console.log('productCreate--------->>>req.body: ',req.body);
 
     if (!storeId) return res.status(400).send("storeId is required");
 
@@ -60,37 +76,50 @@ const productCreate = async (req, res) => {
       description,
       floor,
       features,
+      categoryId,
       price,
+      offerId,
       storeId,
     });
 
     await product.save();
+   // <-- show the real error
 
     res.status(200).send("okay");
   } catch (error) {
-    res.status(500).send("Server error");
+    console.log('error: ',error)
+    res.status(500).send(error.message); // <-- show helpful error to client
   }
 };
 
 const productUpdate = async (req, res) => {
   try {
-    const updated = await Product.updateOne(
-      { _id: req.params.id },
-      {
-        $set: {
-          productName: req.body.productName,
-          description: req.body.description,
-          floor: req.body.floor,
-          features: req.body.features,
-          price: req.body.price,
-        },
-      }
+    const updateFields = {
+      productName: req.body.productName,
+      description: req.body.description,
+      floor: req.body.floor,
+      features: req.body.features,
+      price: req.body.price,
+      categoryId: req.body.categoryId,
+      offerId: req.body.offerId,
+      storeId: req.body.storeId,
+    };
+
+    Object.keys(updateFields).forEach(
+      (key) => updateFields[key] === undefined && delete updateFields[key]
     );
 
+    const updated = await Product.updateOne(
+      { _id: req.params.id },
+      { $set: updateFields }
+    );
+
+    if (updated.matchedCount === 0) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
     if (updated.modifiedCount === 0) {
-      return res
-        .status(404)
-        .json({ message: "Product not found or no changes made" });
+      return res.status(200).json({ message: "No changes were made" });
     }
 
     res.json({ message: "Product updated successfully" });
@@ -98,6 +127,7 @@ const productUpdate = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 const productDelete = async(req,res)=>{
   try{

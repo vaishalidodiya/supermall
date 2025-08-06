@@ -1,12 +1,30 @@
 let isDataTableInitialized = false;
+const token = getLocalData('token');
 
-$(function(){
+$(function () {
   loadstoreTable();
-  
-})
+
+  $(function () {
+    $(document).on("click", ".view-btn", function () {
+      currentStoreId = $(this).data("id");
+
+      loadProductTable();
+
+      $("#inputDiv").hide();
+      $("#viewStorePage").show();
+      
+    });
+  });
+
+  $("#back").click(() => {
+  $("#viewStorePage").hide();    // Hide Product Details section
+  $("#inputDiv").show();         // Show Store List section
+});
+});
+
 
 const loadstoreTable = () => {
-    console.log("✅ loadstoreTable called");
+  console.log("✅ loadstoreTable called");
 
   var table = $("#storeTable").dataTable({
     processing: true,
@@ -15,6 +33,14 @@ const loadstoreTable = () => {
     ajax: {
       url: "/api/user/userCreate",
       type: "GET",
+      headers: {
+        Authorization: "Bearer "+token,
+      },
+      error: function (xhr, error, thrown) {
+        if (xhr.status === 401) {
+          window.location.href = '/admin/login'
+        }
+      },
     },
     columnDefs: [
       {
@@ -47,15 +73,11 @@ const loadstoreTable = () => {
         sorting: false,
         orderable: false,
         render: function (data, type, row, meta) {
-          let html = `<button class="btn btn-sm bg-secondary-subtle ms-2 fs-6 fw-bold view-btn"
+          let html = `<button class="btn btn-sm  ms-2 fs-6 fw-bold view-btn custom-hover-btn"
             data-id="${row._id}"
-            data-storename="${row.storeName}"
-            data-address="${row.address}"
-            data-floor="${row.floor}"
-            data-contactnumber="${row.contactNumber}"
-            data-description="${row.description}"
-            >View</button>`;
            
+            >View</button>`;
+
           return html;
         },
       },
@@ -66,20 +88,33 @@ const loadstoreTable = () => {
 let currentStoreId = null;
 let currentStoreMaxFloor = null;
 
-$(document).on("click", ".view-btn", function () {
-  currentStoreId = $(this).data("id");
-  const storeFloor = parseInt($(this).data("floor"), 10);
-  currentStoreMaxFloor = storeFloor;
+const loadProductTable = () => {
+  var table = $("#customerProductTable").dataTable({
+    processing: true,
+    serverSide: true,
+    destroy: true,
+    ajax: {
+      url: `/api/admin/product?storeId=${currentStoreId}`,
+      type: "GET",
+      headers: {
+        Authorization: "Bearer "+token,
+      },
+      error: function (xhr, error, thrown) {
+        if (xhr.status === 401) {
+          window.location.href = '/admin/login'
+        }
+      },
+    },
+    columnDefs: [
+      { targets: [0], data: "seqNo" },
+      { targets: [1], data: "productName" },
+      { targets: [2], data: "description" },
+      { targets: [3], data: "floor" },
+      { targets: [4], data: "features" },
+      { targets: [5], data: "categoryName" }, // <- show category name
+      { targets: [6], data: "price" },
+      { targets: [7], data: "offerName" }, // <- show offer name
+    ],
+  });
+};
 
-  $("#viewStoreName").text($(this).data("storename"));
-  $("#viewAddress").text($(this).data("address"));
-  $("#viewFloor").text(storeFloor);
-  $("#viewContactNumber").text($(this).data("contactnumber"));
-  $("#viewDescription").text($(this).data("description"));
-
-  $("#inputDiv").hide();
-  $("#storeForm").hide();
-  $("#viewStorePage").show();
-});
-
-console.log('okay')

@@ -4,12 +4,12 @@ const storeSchema = new mongoose.Schema({
     storeName : {type:String, required:true},
     address : {type:String, required:true},
     floor : {type:String, required:true},
-    contactNumber : {type:Number, required:true},
+    contactNumber : {type:String, required:true},
     description : {type:String}
 }, {
     timestamps:true
 })
 
-const Store = mongoose.model('stores', storeSchema);
+const Store = mongoose.model('store', storeSchema);
 
 module.exports = Store

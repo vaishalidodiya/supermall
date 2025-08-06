@@ -1,4 +1,5 @@
 let isDataTableInitialized = false;
+const token = getLocalData("token");
 
 const showSuccessMessage = (message) => {
   $("#successMessage").text(message).fadeIn();
@@ -16,6 +17,14 @@ const loadOfferTable = () => {
     ajax: {
       url: "/api/admin/offer",
       type: "GET",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+      error: function (xhr) {
+        if (xhr.status === 401) {
+          window.location.href = "/admin/login";
+        }
+      },
     },
     columnDefs: [
       {
@@ -122,6 +131,9 @@ $(function () {
     $.ajax({
       url: "/api/admin/offer",
       type: "POST",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
       contentType: "application/json",
       data: JSON.stringify(offer),
       success: function () {
@@ -135,11 +147,17 @@ $(function () {
       },
 
       error: function (xhr) {
-        console.error("XHR Error:", xhr);
-        alert(
-          "Something went wrong: " +
-            (xhr.responseJSON?.msg || xhr.statusText || "Unknown error")
-        );
+        if (xhr.status === 401) {
+          alert("Token expired");
+          setTimeout(function () {
+            window.location.href = "/admin/login";
+          }, 1000);
+        } else {
+          alert(
+            "Something went wrong: " +
+              (xhr.responseJSON?.msg || xhr.statusText || "Unknown error")
+          );
+        }
       },
     });
   });
@@ -150,13 +168,23 @@ $(function () {
     $.ajax({
       url: actionUrl,
       method: "DELETE",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
       success: function () {
         showSuccessMessage("Offer deleted successfully");
         $("#deleteConfirmModal").modal("hide");
         loadOfferTable();
       },
-      error: function () {
-        alert("Delete failed.");
+      error: function (xhr) {
+        if (xhr.status === 401) {
+          alert("Token expired");
+          setTimeout(function () {
+            window.location.href = "/admin/login";
+          }, 1000);
+        } else {
+          alert("Delete failed.");
+        }
       },
     });
   });
@@ -175,6 +203,9 @@ $(function () {
     $.ajax({
       url: actionUrl,
       type: "PATCH",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
       contentType: "application/json",
       data: JSON.stringify(updatedData),
       success: function () {
@@ -182,8 +213,15 @@ $(function () {
         $("#updateModal").modal("hide");
         loadOfferTable();
       },
-      error: function () {
-        alert("Update failed.");
+      error: function (xhr) {
+        if (xhr.status === 401) {
+          alert("Token expired");
+          setTimeout(function () {
+            window.location.href = "/admin/login";
+          }, 1000);
+        } else {
+          alert("Update failed.");
+        }
       },
     });
   });

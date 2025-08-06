@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>userRegistration</title>
+   {{> headers }}
+</head>
+<body>
+
+
+    <div class="d-flex justify-content-center mt-5" >
+
+    <div class="p-4 border rounded bg-light" style="min-width: 400px; " id="regDiv" >
+       
+        <div id="loginError" class="text-danger text-center mb-2" style="display: none;">Incorrect Details</div>
+
+      <h1 class="text-center">Registration</h1>
+
+      <form id="registrationForm" class="mt-4" >
+
+       
+        <input class="form-control mb-3" type="text" placeholder="Name" required name="name">
+        <div class="text-danger small" id="nameError"></div>
+
+        
+        <input class="form-control mb-3" type="number" placeholder="Mobile Number" required name="contactNumber" id="mobileInput">
+        <div class="text-danger small" id="mobileNumberError"></div>
+
+
+        <input class="form-control mb-3" type="email" placeholder="Email" required name="email" id="emailInput">
+        <div class="text-danger small" id="emailerror"></div>
+
+
+       
+
+        <input class="form-control mb-3" type="password" placeholder="Password" required name="password">
+        <div class="text-danger small" id="passworderror"></div>
+
+        <input class="form-control mb-3" type="password" placeholder="Confirm Password" required name="confirmPassword">
+        <div class="text-danger small" id="confirmPasswordError"></div>
+
+
+        <button type="submit" class="btn btn-primary w-100">Submit</button>
+      </form>
+    </div>
+  </div>
+
+      <script src="../js/user.js"></script>
+
+</body>
+</html>

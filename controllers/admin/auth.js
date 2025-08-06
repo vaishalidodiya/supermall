@@ -1,25 +1,27 @@
 require("dotenv").config();
+const bcrypt = require('bcrypt')
+const User = require("../../models/user");
 const { sendResponse, createToken } = require("../../helper");
 
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const adminEmail = process.env.ADMIN_EMAIL;
-    const adminPassword = process.env.ADMIN_PASSWORD;
-
-    if (email !== adminEmail) {
-      return sendResponse(res, 401, "Invalid email.");
+    const admin = await User.findOne({ email: email, userType: "admin" },{},{lean:true});
+    if (!admin) {
+      return sendResponse(res, 401, "User not found");
+    }
+    
+    const isMatch = bcrypt.compareSync(password, admin.password)
+    if (!isMatch) {
+      return sendResponse(res, 401, "Invalid email or password");
     }
 
-    if (password !== adminPassword) {
-      return sendResponse(res, 401, "Incorrect password.");
-    }
+    
 
-    req.session.admin = true;
 
-    const token = createToken({ email });
-    sendResponse(res, 200, "Logged in successfully", { token });
+    const token = createToken({ email, id: admin._id });
+    sendResponse(res, 200, "Logged in successfully", { id:admin._id, token });
   } catch (error) {
     console.error("Login error:", error);
     sendResponse(res, 500, "Server error");

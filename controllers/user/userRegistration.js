@@ -20,12 +20,16 @@ const userCreate = async (req, res) => {
       }
     }
 
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+
     const userRegistration = new User({
       name,
       contactNumber,
       email,
-      userType,
-      password,
+      userType:'user',
+      password:hashedPassword
     });
 
     await userRegistration.save();
@@ -53,8 +57,14 @@ const userLogin = async (req, res) => {
 
     await user.save();
 
+    req.session.userId = user._id;
+    console.log("Setting session userId:", user._id); // or admin._id
+
+    console.log('userId', req.session.userId)
+
+
     // console.log("OTP sent to user:", otp);
-    res.render("user", { userId: user._id });
+    res.render("userDashboard", { userId: user._id });
   } catch (error) {
     res.status(500).send("Login Error: " + error.message);
   }

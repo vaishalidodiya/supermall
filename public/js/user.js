@@ -15,16 +15,10 @@ $(document).ready(() => {
     const name = $("input[name='name']").val().trim();
     const contactNumber = $("input[name='contactNumber']").val().trim();
     const email = $("input[name='email']").val().trim();
-    const userType = $("input[name='userType']").val().trim();
     const password = $("input[name='password']").val().trim();
     const confirmPassword = $("input[name='confirmPassword']").val().trim();
 
     let isValid = true;
-
-    if (userType.toLowerCase() === "admin") {
-      $("#userTypeError").text("Admin already registered");
-      isValid = false;
-    }
 
     if (confirmPassword !== password) {
       $("#confirmPasswordError").text("Not match with password");
@@ -48,12 +42,15 @@ $(document).ready(() => {
 
     if (!isValid) return;
 
-    const userData = { name, contactNumber, email, userType, password };
+    const userData = { name, contactNumber, email, password };
     console.log(userData);
 
     $.ajax({
       url: "/api/user/userCreate",
       type: "POST",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
       contentType: "application/json",
       data: JSON.stringify(userData),
       success: function () {
@@ -61,7 +58,12 @@ $(document).ready(() => {
         $("#registrationForm")[0].reset();
       },
       error: function (xhr) {
-        if (xhr.status === 409) {
+        if (xhr.status === 401) {
+          $("#loginError").text("Token expired").show();
+          setTimeout(function () {
+            window.location.href = "/admin/login";
+          }, 1000);
+        } else if (xhr.status === 409) {
           const errorMessage = xhr.responseJSON.error;
           $("#loginError").text(errorMessage).show();
         } else {
@@ -71,22 +73,13 @@ $(document).ready(() => {
     });
   });
 
-  // login
-
-  $("#loginBtn").click(() => {
-    $("#loginDiv").show();
-    $("#loginBtn").hide();
-    $("#regBtn").hide();
-  });
-
-  $("#loginForm").submit((e) => {
+  $("#userLoginForm").submit((e) => {
     e.preventDefault();
-    console.log("Login form submitted!")
+    console.log("Login form submitted!");
 
-    const email = $("input[name='loginEmail']").val().trim();
-    const password = $("input[name='loginPassword']").val().trim();
+    const email = $("input[name='email']").val().trim();
+    const password = $("input[name='password']").val().trim();
 
-    
     let isValid = true;
 
     if (!email) {
@@ -101,32 +94,40 @@ $(document).ready(() => {
     if (!isValid) return;
 
     const loginData = { email, password };
-    console.log(loginData)
-   $.ajax({
-  url: "/api/user/userCreate/login",
-  type: "POST",
-  contentType: "application/json",
-  data: JSON.stringify(loginData),
-  
-  success: function (res) {
-    console.log("Login success response:", res);
-    $("#loginError").hide();
-    setTimeout(function () {
-      window.location.href = "/user/userDashboard";
-    }, 1000);
-  },
-  error: function (xhr, status, error) {
-    console.error("Login AJAX error:", status, error);
-    let errorMsg = "Login failed. Please try again.";
-    try {
-      const response = JSON.parse(xhr.responseText);
-      errorMsg = response.message || errorMsg;
-    } catch (e) {
-      console.error("Error parsing response", e);
-    }
-    $("#loginError").text(errorMsg).show();
-  },
-});
-
+    console.log("logindata", loginData);
+    $.ajax({
+      url: "/api/user/userCreate/login",
+      type: "POST",
+      contentType: "application/json",
+      data: JSON.stringify(loginData),
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+      success: function (res) {
+        console.log("Login success response:", res);
+        $("#loginError").hide();
+        setTimeout(function () {
+          window.location.href = "/user/userDashboard";
+        }, 1000);
+      },
+      error: function (xhr, status, error) {
+        console.error("Login AJAX error:", status, error);
+        let errorMsg = "Login failed. Please try again.";
+        if (xhr.status === 401) {
+          $("#loginError").text(errorMsg).show();
+          setTimeout(function () {
+            window.location.href = "/admin/login";
+          }, 1000);
+        } else {
+          try {
+            const response = JSON.parse(xhr.responseText);
+            errorMsg = response.message || errorMsg;
+          } catch (e) {
+            console.error("Error parsing response", e);
+          }
+          $("#loginError").text(errorMsg).show();
+        }
+      },
+    });
   });
 });

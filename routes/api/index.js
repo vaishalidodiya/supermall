@@ -8,4 +8,5 @@
   route.use("/admin", adminRoute);
   route.use("/user",userRoute);
 
+  
   module.exports = route;

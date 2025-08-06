@@ -1,4 +1,4 @@
-  const express = require('express');
+const express = require('express');
 
   const route = express.Router();
 
@@ -11,10 +11,9 @@
   route.use('/admin', adminRoute);
   route.use('/user',userRoute);
  
-
+  route.get('/',(req,res)=>{
+    res.render('dashboard')
+  })
 
 
   module.exports = route;
-
-
-

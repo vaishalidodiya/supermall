@@ -6,9 +6,7 @@ route.get('/',(req,res)=>{
   res.render('offer')
 })
 
-route.get('/offer/:id/edit',(req,res)=>{
-
-})
-
 module.exports = route;
+
+
 

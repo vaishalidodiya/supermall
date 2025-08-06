@@ -38,9 +38,7 @@ app.set("views", template_path);
 app.use(express.static(__dirname + "/public"));
 hbs.registerPartials(partials_path);
 
-app.get("/", (req, res) => {
-  res.render("userDashboard");
-});
+
 
 const routes = require("./routes");
 app.use("/", routes);

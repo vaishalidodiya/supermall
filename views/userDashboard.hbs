@@ -5,55 +5,90 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>User</title>
      {{> headers }}
-</head>
-<body>
-        <button type="submit" class="btn btn-primary mt-3 ms-5">Store</button>
 
-  <div id="inputDiv" class="px-4">
+  <style>
+    .custom-hover-btn:hover {
+  background-color: rgb(44, 44, 190) !important;
+  color: white !important;
+  transform: scale(1.05);
+  transition: 0.3s;
+}
+
+.custom-hover-btn{
+  background-color: rgb(199, 211, 238);
+}
+
+  </style>
+</head>
+<body style="background-color: rgb(243, 239, 235);">
+
+  
+
+    
+     {{> dashboard }}
+    
+
+  
+
+ 
+      <div id="inputDiv" class="px-4 mt-5" >
       
 
-          <h1 class="text-center">Store List</h1>
-      <table class="table" id="storeTable" >
+          <h1 class="text-center mt-5" style="color: rgb(13, 13, 107);">Store List</h1>
+      <table class="table table-bordered border-secondary" id="storeTable" >
         <thead>
           <tr>
-            <th>Sr no.</th>
-            <th>Store Name</th>
-            <th>Address</th>
-            <th>Floor</th>
-            <th>Contact Number</th>
-            <th>Description</th>
-            <th>Actions</th>
+            <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Sr no.</th>
+            <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Store Name</th>
+            <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Address</th>
+            <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Floor</th>
+            <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Contact Number</th>
+            <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Description</th>
+            <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Actions</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
 
-      <button
-        type="button"
-        id="backToMenuFromList"
-        class="btn btn-secondary mt-3"
-      >Back</button>
+      
     </div>
 
     <div id="viewStorePage" class="p-4" style="display: none;">
-  <h3 class="text-center mb-4">Store Details</h3>
-  <div class="card">
-    <div class="card-body">
-      <p><strong>Store Name:</strong> <span id="viewStoreName"></span></p>
-      <p><strong>Address:</strong> <span id="viewAddress"></span></p>
-      <p><strong>Floor:</strong> <span id="viewFloor"></span></p>
-      <p><strong>Contact Number:</strong> <span id="viewContactNumber"></span></p>
-      <p><strong>Description:</strong> <span id="viewDescription"></span></p>
-    </div>
-  </div>
-  <div>
-    <button id="addProduct" class="mt-3">Add Product</button>
-    <button id="listProduct" class="ms-2" >List of Products</button>
-  </div>
-  <div class="mt-4 text-center">
-    <button id="backToListFromView" class="btn btn-secondary">Back</button>
-  </div>
+  <div class="px-4"  id="productList">
+        <h1 class="text-center mt-5" style="color: rgb(13, 13, 107);">Product List</h1>
+
+        <table class="table"  id="customerProductTable">
+          <thead>
+            <tr>
+              <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Sr no.</th>
+              <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Product Name</th>
+              <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Description</th>
+              <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Floor</th>
+              <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Features</th>
+              <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Category</th>
+              <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Price</th>
+              <th style="background-color: rgb(31, 31, 148); color:rgb(241, 129, 77); font-size:20px;">Offer</th>
+             
+
+            </tr>
+          </thead>
+          <tbody></tbody>
+
+        </table>
+
+        <button type="button" id="back" class="btn text-white " 
+         style="background-color: rgb(31, 31, 148); font-size:15px;">Back</button>
+      </div>
 </div>
+
+
+ 
+       
+
+
+  
+  
+
 
     <script src="../js/userDashboard.js"></script>
 

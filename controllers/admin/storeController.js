@@ -1,13 +1,29 @@
 const Store = require("../../models/store");
 
 const storeList = async (req, res) => {
+  const search = req.query["search[value]"];
   const start = parseInt(req.query.start);
   const length = parseInt(req.query.length);
-  
 
   try {
+    let where = {};
+    if (search) {
+      where = {
+        $or: [
+          {
+            storeName: new RegExp(search,'i'),
+          },
+          {
+            address: new RegExp(search,'i'),
+          },
+          {
+            description: new RegExp(search,'i'),
+          },
+        ],
+      };
+    }
     let stores = await Store.find(
-      {},
+      where,
       {},
       { skip: start, limit: length, sort: { createdAt: -1 }, lean: true }
     );
@@ -17,7 +33,7 @@ const storeList = async (req, res) => {
       return elem;
     });
 
-    const total = await Store.countDocuments();
+    const total = await Store.countDocuments(where);
 
     res.json({
       status: 0,
@@ -39,7 +55,7 @@ const storeDetails = async (req, res) => {
     });
     if (!stores) return res.status(404).json({ message: "Store not found" });
 
-    res.json({ stores });
+    res.json(stores);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
