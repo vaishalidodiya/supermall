@@ -4,9 +4,11 @@ const app = express();
 const hbs = require("hbs");
 const path = require("path");
 const session = require("express-session");
+const morgan = require('morgan');
 
 require("./config/database");
 
+app.use(morgan('combined'));
 app.use(
   session({
     secret: "secretpassword",

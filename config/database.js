@@ -5,7 +5,7 @@ require("dotenv").config();
 const userModel = require("../models/user");
 const {
   ADMIN_NAME,
-  ADMIN_CONTACTNUMBER,
+  ADMIN_CONTACT_NUMBER,
   ADMIN_EMAIL,
   ADMIN_PASSWORD,
   DB_HOST,
@@ -25,7 +25,7 @@ mongoose
       
       await userModel.create({
         name: ADMIN_NAME,
-        contactNumber: ADMIN_CONTACTNUMBER,
+        contactNumber: ADMIN_CONTACT_NUMBER,
         email: ADMIN_EMAIL,
         password: hashedPassword,
         userType: "admin",
