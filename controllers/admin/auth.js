@@ -17,8 +17,8 @@ const login = async (req, res) => {
       return sendResponse(res, 401, "Invalid email or password");
     }
 
-    
-
+    req.session.userId = admin._id;
+    req.session.email = admin.email;
 
     const token = createToken({ email, id: admin._id });
     sendResponse(res, 200, "Logged in successfully", { id:admin._id, token });

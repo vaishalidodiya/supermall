@@ -1,12 +1,12 @@
 const express = require('express');
 const { userCreate, userLogin } = require('../../../controllers/user/userRegistration');
 const { userStoreList } = require('../../../controllers/user/storeList');
-const isAuthenticated = require('../../../middelware/auth');
+const { verifyToken } = require('../../../middelware/authtoken');
 const route = express.Router();
 
-route.get('/',isAuthenticated,userStoreList)
-route.post('/',userCreate);
-route.post('/login',userLogin);
+route.get('/',verifyToken,userStoreList)
+route.post('/',verifyToken,userCreate);
+route.post('/login',verifyToken,userLogin);
 
 module.exports = route;
 

@@ -1,4 +1,5 @@
 const express = require('express');
+const { isAuthenticated } = require('../../middelware/auth');
 const route = express.Router();
 
 
@@ -7,11 +8,11 @@ route.get('/registration',(req,res)=>{
   res.render('registration')
 })
 
-route.get('/compareProduct',(req,res)=>{
+route.get('/compareProduct',isAuthenticated,(req,res)=>{
   res.render('compareProduct')
 })
 
-route.get('/userDashboard',(req,res)=>{
+route.get('/userDashboard',isAuthenticated,(req,res)=>{
   res.render('userDashboard')
 })
 

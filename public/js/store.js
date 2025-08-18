@@ -170,7 +170,6 @@ $(function () {
     if (!isValid) return;
 
     const storeData = { storeName, address, floor, contactNumber, description };
-    console.log("Submitting storeData:", storeData);
 
     $.ajax({
       url: "/api/admin/store",
@@ -231,7 +230,7 @@ $(function () {
 
   $("#updateForm").submit(function (e) {
     e.preventDefault();
-
+    
     let isValid = true;
     const floorVal = $("#updateFloor").val().trim();
 
@@ -253,6 +252,9 @@ $(function () {
     $.ajax({
       url: actionUrl,
       type: "PATCH",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
       contentType: "application/json",
       data: JSON.stringify(updatedData),
       success: function () {
@@ -260,8 +262,18 @@ $(function () {
         $("#updateModal").modal("hide");
         loadstoreTable();
       },
-      error: function () {
-        alert("Update failed.");
+      error: function (xhr) {
+        if (xhr.status === 401) {
+          alert("Token expired");
+          setTimeout(function () {
+            window.location.href = "/admin/login";
+          }, 1000);
+        } else {
+          alert(
+            "Update failed: " +
+              (xhr.responseJSON?.msg || xhr.statusText || "Unknown error")
+          );
+        }
       },
     });
   });
@@ -311,7 +323,6 @@ $("#listProduct").click(() => {
 // Add Product
 
 $("#addProductForm").submit((e) => {
-  console.log("submitted");
 
   e.preventDefault();
 
@@ -326,16 +337,6 @@ $("#addProductForm").submit((e) => {
   const features = $("input[name='features']").val().trim();
   const price = $("input[name='price']").val().trim();
   const offer = $("#offerDropdown").val().trim();
-
-  console.log("Form values:", {
-    productName,
-    description,
-    floor,
-    features,
-    category,
-    price,
-    offer,
-  });
 
   let isValid = true;
 
@@ -358,7 +359,6 @@ $("#addProductForm").submit((e) => {
   }
 
   if (!isValid) {
-    console.log("Validation failed");
     return;
   }
 
@@ -377,8 +377,6 @@ $("#addProductForm").submit((e) => {
     offerId: offer, // this too
     storeId: currentStoreId,
   };
-
-  console.log("Submitting Product Data:", productData);
 
   $.ajax({
     url: "/api/admin/product",
@@ -567,7 +565,6 @@ $("#updateProductForm").submit(function (e) {
     price: $("#productPrice").val(),
     offerId: $("#updateOfferDropdown").val(),
   };
-  console.log("productData :", productdData);
   $.ajax({
     url: actionUrl,
     type: "PATCH",

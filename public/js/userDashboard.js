@@ -17,14 +17,13 @@ $(function () {
   });
 
   $("#back").click(() => {
-  $("#viewStorePage").hide();    // Hide Product Details section
-  $("#inputDiv").show();         // Show Store List section
+  $("#viewStorePage").hide();   
+  $("#inputDiv").show();      
 });
 });
 
 
 const loadstoreTable = () => {
-  console.log("✅ loadstoreTable called");
 
   var table = $("#storeTable").dataTable({
     processing: true,
@@ -111,9 +110,9 @@ const loadProductTable = () => {
       { targets: [2], data: "description" },
       { targets: [3], data: "floor" },
       { targets: [4], data: "features" },
-      { targets: [5], data: "categoryName" }, // <- show category name
+      { targets: [5], data: "categoryName" }, 
       { targets: [6], data: "price" },
-      { targets: [7], data: "offerName" }, // <- show offer name
+      { targets: [7], data: "offerName" },
     ],
   });
 };

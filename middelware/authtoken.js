@@ -15,6 +15,7 @@ const verifyToken = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (err) {
+    console.log('verifyToken:::::::::>>>error: ', err)
     return sendResponse(res, 403,'Invalid or expired token',{})
   }
 };

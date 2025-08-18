@@ -58,12 +58,6 @@ const userLogin = async (req, res) => {
     await user.save();
 
     req.session.userId = user._id;
-    console.log("Setting session userId:", user._id); // or admin._id
-
-    console.log('userId', req.session.userId)
-
-
-    // console.log("OTP sent to user:", otp);
     res.render("userDashboard", { userId: user._id });
   } catch (error) {
     res.status(500).send("Login Error: " + error.message);

@@ -24,8 +24,7 @@ $("#loginForm").submit((e) => {
     type: "POST",
     contentType: "application/json",
     data: JSON.stringify(loginData),
-    success: function (data, textStatus, jqXHR) {
-      console.log('data: ',data)
+    success: function (data) {
       setLocalData('token',data?.data?.token);
       $("#loginError").hide();
       setTimeout(function () {

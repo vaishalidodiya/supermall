@@ -47,19 +47,12 @@ const categoriesAdd = async (req, res) => {
   try {
     const { categoryName, description } = req.body;
 
-    console.log('cate name', categoryName)
-    console.log('cate des', description)
-
-    console.log("Received body:", req.body);
-
     const newcategories = new Category({
       categoryName,
       description,
     });
 
     await newcategories.save();
-
-    console.log("category", newcategories);
 
     res
       .status(201)

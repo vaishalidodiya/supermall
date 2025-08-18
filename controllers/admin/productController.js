@@ -14,9 +14,11 @@ const productList = async (req, res) => {
       .skip(start)
       .limit(length)
       .sort({ createdAt: -1 })
-      .populate("categoryId", "categoryName") // <-- Get categoryName
-      .populate("offerId", "offerName")       // <-- Get offerName
-        .select("_id productName description floor features price storeId categoryId offerId createdAt updatedAt") // explicitly include _id
+      .populate("categoryId", "categoryName")
+      .populate("offerId", "offerName")
+      .select(
+        "_id productName description floor features price storeId categoryId offerId createdAt updatedAt"
+      )
 
       .lean();
 
@@ -26,10 +28,6 @@ const productList = async (req, res) => {
       categoryName: elem.categoryId?.categoryName || "N/A",
       offerName: elem.offerId?.offerName || "N/A",
     }));
-
-    console.log('product data: ', products);
-    console.log('🔥 Requested storeId:', storeId);
-console.log('🔥 Returned products:', products);
 
     res.json({
       status: 0,
@@ -42,8 +40,6 @@ console.log('🔥 Returned products:', products);
     res.status(500).json({ error: error.message });
   }
 };
-
-
 
 const productDetails = async (req, res) => {
   try {
@@ -61,13 +57,18 @@ const productDetails = async (req, res) => {
   }
 };
 
-
 const productCreate = async (req, res) => {
   try {
-    console.log("🔥 Received product data:", req.body); // Should show your data
-
-    const { productName, description, floor, features,categoryId, price,offerId, storeId } = req.body;
-    console.log('productCreate--------->>>req.body: ',req.body);
+    const {
+      productName,
+      description,
+      floor,
+      features,
+      categoryId,
+      price,
+      offerId,
+      storeId,
+    } = req.body;
 
     if (!storeId) return res.status(400).send("storeId is required");
 
@@ -83,12 +84,11 @@ const productCreate = async (req, res) => {
     });
 
     await product.save();
-   // <-- show the real error
 
     res.status(200).send("okay");
   } catch (error) {
-    console.log('error: ',error)
-    res.status(500).send(error.message); // <-- show helpful error to client
+    console.log("productCreate:::::::::::>>>error: ", error);
+    res.status(500).send(error.message);
   }
 };
 
@@ -128,12 +128,10 @@ const productUpdate = async (req, res) => {
   }
 };
 
-
-const productDelete = async(req,res)=>{
-  try{
+const productDelete = async (req, res) => {
+  try {
     const product = await Product.findOne({
       _id: req.params.id,
-     
     });
 
     if (!product) {
@@ -142,10 +140,15 @@ const productDelete = async(req,res)=>{
 
     await Product.deleteOne({ _id: req.params.id });
     res.json({ message: "Product deleted successfully" });
-  }catch(error){
-        res.status(500).json({ error: error.message });
-
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-}
+};
 
-module.exports = { productCreate, productDetails, productList, productUpdate, productDelete };
+module.exports = {
+  productCreate,
+  productDetails,
+  productList,
+  productUpdate,
+  productDelete,
+};

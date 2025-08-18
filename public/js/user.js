@@ -1,3 +1,5 @@
+const token = getLocalData('token');
+
 $(document).ready(() => {
   $("#regBtn").click(() => {
     $("#regDiv").show();
@@ -43,7 +45,6 @@ $(document).ready(() => {
     if (!isValid) return;
 
     const userData = { name, contactNumber, email, password };
-    console.log(userData);
 
     $.ajax({
       url: "/api/user/userCreate",
@@ -75,7 +76,6 @@ $(document).ready(() => {
 
   $("#userLoginForm").submit((e) => {
     e.preventDefault();
-    console.log("Login form submitted!");
 
     const email = $("input[name='email']").val().trim();
     const password = $("input[name='password']").val().trim();
@@ -94,7 +94,6 @@ $(document).ready(() => {
     if (!isValid) return;
 
     const loginData = { email, password };
-    console.log("logindata", loginData);
     $.ajax({
       url: "/api/user/userCreate/login",
       type: "POST",
@@ -104,7 +103,6 @@ $(document).ready(() => {
         Authorization: "Bearer " + token,
       },
       success: function (res) {
-        console.log("Login success response:", res);
         $("#loginError").hide();
         setTimeout(function () {
           window.location.href = "/user/userDashboard";

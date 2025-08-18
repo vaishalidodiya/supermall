@@ -51,7 +51,6 @@ const storeDetails = async (req, res) => {
   try {
     const stores = await Store.findOne({
       _id: req.params.id,
-      // userId: req.session.userId,
     });
     if (!stores) return res.status(404).json({ message: "Store not found" });
 
@@ -64,7 +63,6 @@ const storeDetails = async (req, res) => {
 const storeCreate = async (req, res) => {
   try {
     const { storeName, address, floor, contactNumber, description } = req.body;
-    console.log("Create store data:", req.body);
     const newStore = new Store({
       storeName,
       address,
@@ -72,7 +70,6 @@ const storeCreate = async (req, res) => {
       contactNumber,
       description,
     });
-    console.log("UserID from session:", req.session.userId);
     await newStore.save();
 
     res.status(201).json({ message: "Store created successfully", newStore });

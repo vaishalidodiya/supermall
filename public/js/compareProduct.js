@@ -1,7 +1,13 @@
-$(document).ready(function () {
-  let products = [];
+const token = getLocalData("token");
 
-  // Load all products to dropdown
+$(document).ready(function () {
+  $("#backBtn").click(()=>{
+      $("#comparisonTable").hide();
+    $("#mainDiv").show();
+    $("#backBtn").hide();
+  })
+
+  let products = [];
   $.ajax({
     url: "/api/user/productCompare",
     type: "GET",
@@ -12,11 +18,10 @@ $(document).ready(function () {
       products = data;
 
       if (products.length === 0) {
-        // No products found — show message instead of dropdown options
         $("#product1, #product2").empty();
         $("#comparisonBody").empty();
         $("#comparisonTable").hide();
-        $("#noProductsMsg").show(); // We'll create this element in HTML
+        $("#noProductsMsg").show();
       } else {
         $("#noProductsMsg").hide();
 
@@ -29,10 +34,7 @@ $(document).ready(function () {
         });
       }
 
-      data.forEach((product) => {
-        const option = `<option value="${product._id}">${product.productName} </option>`;
-        $("#product1, #product2").append(option);
-      });
+     
     },
     error: function (xhr) {
       if (xhr.status === 401) {
@@ -49,7 +51,6 @@ $(document).ready(function () {
     },
   });
 
-  // Compare button click
   $("#compareBtn").click(function () {
     const id1 = $("#product1").val();
     const id2 = $("#product2").val();
@@ -67,10 +68,10 @@ $(document).ready(function () {
       ["Product Name", product1.productName, product2.productName],
       ["Description", product1.description, product2.description],
       ["Floor", product1.floor, product2.floor],
-      ["Features", product1.features, product2.features],
-      ["Category", product1.categoryName, product2.categoryName],
-      ["Price", product1.price, product2.price],
-      ["Offer", product1.offerName, product2.offerName],
+      ["Features", product1.features ?? "-", product2.features ?? "-"],
+      ["Category", product1.categoryName ?? "-", product2.categoryName ?? "-"],
+      ["Price", product1.price , product2.price ],
+      ["Offer", product1.offerName ?? "-", product2.offerName ?? "-"],
     ];
 
     $("#comparisonBody").empty();
@@ -81,9 +82,9 @@ $(document).ready(function () {
       );
     });
 
-    console.log($("#mainDiv").length); // Should print 1 if found
-
     $("#comparisonTable").show();
+    $("#backBtn").show()
     $("#mainDiv").hide();
   });
+  
 });
