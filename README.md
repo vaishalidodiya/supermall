@@ -1,5 +1,6 @@
-# Government document share - AV Document Hub
-- Upload and download the you documents whenever wherever
+# Super Mall
+- Manage the store and offer as admin
+- Get the details of stores and products as user
  
 ### Tech stack
 - node
@@ -31,6 +32,6 @@
 ```
 
 ### UI
-- open ```http://localhost:5000```
+- open ```http://localhost:5100```
 
 
